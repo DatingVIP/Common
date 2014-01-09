@@ -11,6 +11,7 @@
 
 namespace ICanBoogie;
 
+use Brickrouge\format;
 /**
  * Exception thrown when there is something wrong with an array offset.
  *
@@ -177,10 +178,132 @@ class OffsetNotWritable extends OffsetError
  * This is the base class for property exceptions, one should rather use the
  * {@link PropertyNotDefined}, {@link PropertyNotReadable} or {@link PropertyNotWritable}
  * exceptions.
+ *
+ * @property-read string $property The property that triggered the error.
+ * @property-read object $container The container which property triggered the error.
+ * @property-read PropertyErrorInfo The error information passed during construct.
  */
 class PropertyError extends \RuntimeException
 {
+	/**
+	 * Error information.
+	 *
+	 * @var PropertyErrorInfo
+	 */
+	private $error_info;
 
+	/**
+	 * Initializes the {@link $error_info}, {@link $code} and {@link $previous} properties.
+	 *
+	 * @param PropertyErrorInfo $error_info
+	 * @param number $code
+	 * @param \Exception $previous
+	 */
+	public function __construct(PropertyErrorInfo $error_info, $code=500, \Exception $previous=null)
+	{
+		$this->error_info = $error_info;
+
+		parent::__construct((string) $error_info, $code, $previous);
+	}
+
+	/**
+	 * Support for the following magic property:
+	 *
+	 * - `property`
+	 * - `container`
+	 * - `error_info`
+	 *
+	 * @param string $property
+	 *
+	 * @throws PropertyNotDefined in attempt to get an unsupported property.
+	 *
+	 * @return mixed
+	 */
+	public function __get($property)
+	{
+		switch ($property)
+		{
+			case 'property':
+
+				return $this->error_info->property;
+
+			case 'container':
+
+				return $this->error_info->container;
+
+			case 'error_info':
+
+				return $this->error_info;
+		}
+
+		throw new PropertyNotDefined(new PropertyErrorInfo($property, $this), $this->getCode(), $this);
+	}
+}
+
+/**
+ * Information about a property error.
+ */
+class PropertyErrorInfo
+{
+	static public function from($source)
+	{
+		if (is_string($source) || (is_object($source) && method_exists($source, '__toString')))
+		{
+			return new static(null, null, (string) $source);
+		}
+
+		if (is_array($source))
+		{
+			$source += array(null, null, null);
+
+			return new static($source[0], $source[1], $source[2]);
+		}
+
+		throw new \BadMethodCallException("Unable to create instance from source.");
+	}
+
+	protected $property;
+	protected $container;
+	public $message;
+
+	public function __construct($property, $container=null, $message=null)
+	{
+		$this->property = $property;
+		$this->container = $container;
+		$this->message = $message;
+	}
+
+	public function __get($property)
+	{
+		switch ($property)
+		{
+			case 'property':
+
+				return $this->property;
+
+			case 'container':
+
+				return $this->container;
+
+			case 'message':
+
+				return $this->message;
+		}
+
+		throw new PropertyNotDefined(new PropertyErrorInfo($property, $this));
+	}
+
+	public function __toString()
+	{
+		$container = $this->container;
+
+		return format($this->message, array(
+
+			'property' => $this->property,
+			'class' => is_object($container) ? get_class($container) : gettype($container)
+
+		));
+	}
 }
 
 /**
@@ -190,36 +313,29 @@ class PropertyError extends \RuntimeException
  */
 class PropertyNotDefined extends PropertyError
 {
-	public function __construct($message, $code=500, \Exception $previous=null)
+	public function __construct($error_info, $code=500, \Exception $previous=null)
 	{
-		if (is_array($message))
+		if (!($error_info instanceof PropertyErrorInfo))
 		{
-			list($property, $container) = $message + array(1 => null);
+			$error_info = PropertyErrorInfo::from($error_info);
+		}
 
-			if (is_object($container))
+		$property = $error_info->property;
+		$message = &$error_info->message;
+
+		if ($property && !$message)
+		{
+			if (is_object($error_info->container))
 			{
-				$message = format
-				(
-					'Undefined property %property for object of class %class.', array
-					(
-						'%property' => $property,
-						'%class' => get_class($container)
-					)
-				);
+				$message = 'Undefined property %property for object of class %class.';
 			}
 			else
 			{
-				$message = format
-				(
-					'Undefined property %property.', array
-					(
-						'%property' => $property
-					)
-				);
+				$message = 'Undefined property %property.';
 			}
 		}
 
-		parent::__construct($message, $code, $previous);
+		parent::__construct($error_info, $code, $previous);
 	}
 }
 
@@ -230,36 +346,29 @@ class PropertyNotDefined extends PropertyError
  */
 class PropertyNotReadable extends PropertyError
 {
-	public function __construct($message, $code=500, \Exception $previous=null)
+	public function __construct($error_info, $code=500, \Exception $previous=null)
 	{
-		if (is_array($message))
+		if (!($error_info instanceof PropertyErrorInfo))
 		{
-			list($property, $container) = $message + array(1 => null);
+			$error_info = PropertyErrorInfo::from($error_info);
+		}
 
-			if (is_object($container))
+		$property = $error_info->property;
+		$message = &$error_info->message;
+
+		if ($property && !$message)
+		{
+			if (is_object($error_info->container))
 			{
-				$message = format
-				(
-					'The property %property for object of class %class is not readable.', array
-					(
-						'%property' => $property,
-						'%class' => get_class($container)
-					)
-				);
+				$message = 'The property %property for object of class %class is not readable.';
 			}
 			else
 			{
-				$message = format
-				(
-					'The property %property is not readable.', array
-					(
-						'%property' => $property
-					)
-				);
+				$message = 'The property %property is not readable.';
 			}
 		}
 
-		parent::__construct($message, $code, $previous);
+		parent::__construct($error_info, $code, $previous);
 	}
 }
 
@@ -270,36 +379,29 @@ class PropertyNotReadable extends PropertyError
  */
 class PropertyNotWritable extends PropertyError
 {
-	public function __construct($message, $code=500, \Exception $previous=null)
+	public function __construct($error_info, $code=500, \Exception $previous=null)
 	{
-		if (is_array($message))
+		if (!($error_info instanceof PropertyErrorInfo))
 		{
-			list($property, $container) = $message + array(1 => null);
+			$error_info = PropertyErrorInfo::from($error_info);
+		}
 
-			if (is_object($container))
+		$property = $error_info->property;
+		$message = &$error_info->message;
+
+		if ($property && !$message)
+		{
+			if (is_object($error_info->container))
 			{
-				$message = format
-				(
-					'The property %property for object of class %class is not writable.', array
-					(
-						'%property' => $property,
-						'%class' => get_class($container)
-					)
-				);
+				$message = 'The property %property for object of class %class is not writable.';
 			}
 			else
 			{
-				$message = format
-				(
-					'The property %property is not writable.', array
-					(
-						'%property' => $property
-					)
-				);
+				$message = 'The property %property is not writable.';
 			}
 		}
 
-		parent::__construct($message, $code, $previous);
+		parent::__construct($error_info, $code, $previous);
 	}
 }
 
@@ -310,22 +412,8 @@ class PropertyNotWritable extends PropertyError
  */
 class PropertyIsReserved extends PropertyError
 {
-	private $property;
-
 	public function __construct($property, $code=500, \Exception $previous=null)
 	{
-		$this->property = $property;
-
-		parent::__construct(format('Property %property is reserved.', array('%property' => $property)), $code, $previous);
-	}
-
-	public function __get($property)
-	{
-		if ($property === 'property')
-		{
-			return $this->property;
-		}
-
-		throw new PropertyNotDefined(array($property, $this));
+		parent::__construct(new PropertyErrorInfo($property, null, 'Property %property is reserved.'), $code, $previous);
 	}
 }
