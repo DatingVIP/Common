@@ -18,21 +18,17 @@ trait ToArrayRecursiveTrait
 {
 	/**
 	 * Transforms an instance into an array.
-	 *
-	 * @return array
 	 */
-	abstract function to_array();
+	abstract function to_array(): array;
 
 	/**
 	 * Transforms an instance into an array recursively.
-	 *
-	 * @return array
 	 */
-	public function to_array_recursive()
+	public function to_array_recursive(): array
 	{
 		$array = $this->to_array();
 
-		foreach ($array as $key => &$value)
+		foreach ($array as &$value)
 		{
 			if ($value instanceof ToArrayRecursive)
 			{

@@ -17,16 +17,27 @@
 		"issues": "https://github.com/ICanBoogie/Common/issues",
 		"source": "https://github.com/ICanBoogie/Common"
 	},
+	"config": {
+		"sort-packages": true
+	},
 	"require": {
-		"php": ">=5.3"
+		"php": ">=8.0",
+		"ext-mbstring": "*"
 	},
 	"autoload": {
 		"psr-4": {
 			"ICanBoogie\\": "lib"
 		},
 		"files": [
-			"bootstrap.php",
 			"lib/helpers.php"
 		]
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\ICanBoogie\\": "tests"
+		}
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^9.5"
 	}
 }

@@ -11,12 +11,13 @@
 
 namespace ICanBoogie;
 
+/**
+ * An interface for an object that can be converted to an array, recursively.
+ */
 interface ToArrayRecursive extends ToArray
 {
 	/**
 	 * Converts the object into an array recursively.
-	 *
-	 * @return array
 	 */
-	public function to_array_recursive();
+	public function to_array_recursive(): array;
 }

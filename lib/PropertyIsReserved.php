@@ -11,6 +11,8 @@
 
 namespace ICanBoogie;
 
+use Throwable;
+
 /**
  * Exception thrown when a property has a reserved name.
  *
@@ -18,13 +20,11 @@ namespace ICanBoogie;
  */
 class PropertyIsReserved extends PropertyError
 {
-	private $property;
-
-	public function __construct($property, $code=500, \Exception $previous=null)
-	{
-		$this->property = $property;
-
-		parent::__construct(format('Property %property is reserved.', array('%property' => $property)), $code, $previous);
+	public function __construct(
+		private string $property,
+		Throwable $previous = null
+	) {
+		parent::__construct(format('Property %property is reserved.', [ '%property' => $property ]), $previous);
 	}
 
 	public function __get($property)
@@ -34,6 +34,6 @@ class PropertyIsReserved extends PropertyError
 			return $this->property;
 		}
 
-		throw new PropertyNotDefined(array($property, $this));
+		throw new PropertyNotDefined([ $property, $this ]);
 	}
 }

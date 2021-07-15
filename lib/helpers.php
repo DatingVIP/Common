@@ -11,49 +11,78 @@
 
 namespace ICanBoogie;
 
+use Exception;
+
+use function array_filter;
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_search;
+use function array_shift;
+use function array_splice;
+use function array_unshift;
+use function array_walk;
+use function asort;
+use function bin2hex;
+use function chr;
+use function count;
+use function function_exists;
+use function htmlentities;
+use function htmlspecialchars;
+use function is_array;
+use function is_bool;
+use function is_null;
+use function is_numeric;
+use function is_object;
+use function is_scalar;
+use function is_string;
+use function max;
+use function mb_strlen;
+use function mb_strtolower;
+use function mb_strtoupper;
+use function mb_substr;
+use function method_exists;
+use function min;
+use function ob_get_clean;
+use function ob_start;
+use function ord;
+use function preg_match;
+use function preg_replace;
+use function print_r;
+use function random_bytes;
+use function rtrim;
+use function str_replace;
+use function str_split;
+use function strcasecmp;
+use function strcmp;
+use function strpos;
+use function strtolower;
+use function substr;
+use function trim;
+use function vsprintf;
+use function xdebug_var_dump;
+
+use const ENT_COMPAT;
+use const ENT_NOQUOTES;
+use const PHP_SAPI;
+
 /**
  * Escape HTML special characters.
  *
  * HTML special characters are escaped using the {@link htmlspecialchars()} function with the
  * {@link ENT_COMPAT} flag.
- *
- * @param string $str The string to escape.
- * @param string $charset The charset of the string to escape. Defaults to
- * {@link ICanBoogie\CHARSET} (utf-8).
- *
- * @return string
  */
-function escape($str, $charset=CHARSET)
+function escape(string $str): string
 {
-	return htmlspecialchars($str, ENT_COMPAT, $charset);
-}
-
-/**
- * Escape all applicable characters to HTML entities.
- *
- * Applicable characters are escaped using the {@link htmlentities()} function with the {@link ENT_COMPAT} flag.
- *
- * @param string $str The string to escape.
- * @param string $charset The charset of the string to escape. Defaults to
- * {@link ICanBoogie\CHARSET} (utf-8).
- *
- * @return string
- */
-function escape_all($str, $charset=CHARSET)
-{
-	return htmlentities($str, ENT_COMPAT, $charset);
+	return htmlspecialchars($str, ENT_COMPAT);
 }
 
 if (!function_exists(__NAMESPACE__ . '\downcase'))
 {
 	/**
 	 * Returns a lowercase string.
-	 *
-	 * @param string $str
-	 *
-	 * @return string
 	 */
-	function downcase($str)
+	function downcase(string $str): string
 	{
 		return mb_strtolower($str);
 	}
@@ -63,12 +92,8 @@ if (!function_exists(__NAMESPACE__ . '\upcase'))
 {
 	/**
 	 * Returns an uppercase string.
-	 *
-	 * @param string $str
-	 *
-	 * @return string
 	 */
-	function upcase($str)
+	function upcase(string $str): string
 	{
 		return mb_strtoupper($str);
 	}
@@ -79,12 +104,8 @@ if (!function_exists(__NAMESPACE__ . '\capitalize'))
 	/**
 	 * Returns a copy of str with the first character converted to uppercase and the
 	 * remainder to lowercase.
-	 *
-	 * @param string $str
-	 *
-	 * @return string
 	 */
-	function capitalize($str)
+	function capitalize(string $str): string
 	{
 		return upcase(mb_substr($str, 0, 1)) . downcase(mb_substr($str, 1));
 	}
@@ -96,11 +117,9 @@ if (!function_exists(__NAMESPACE__ . '\capitalize'))
  * @param string $str The string to shorten.
  * @param int $length The desired length of the string.
  * @param float $position Position at which characters can be removed.
- * @param bool $shortened `true` if the string was shortened, `false` otherwise.
- *
- * @return string
+ * @param bool|null $shortened `true` if the string was shortened, `false` otherwise.
  */
-function shorten($str, $length=32, $position=.75, &$shortened=null)
+function shorten(string $str, int $length = 32, float $position = .75, ?bool &$shortened = null): string
 {
 	$l = mb_strlen($str);
 
@@ -116,13 +135,16 @@ function shorten($str, $length=32, $position=.75, &$shortened=null)
 	{
 		$str = '…' . mb_substr($str, $l - $length);
 	}
-	else if ($position == $length)
-	{
-		$str = mb_substr($str, 0, $length) . '…';
-	}
 	else
 	{
-		$str = mb_substr($str, 0, $position) . '…' . mb_substr($str, $l - ($length - $position));
+		if ($position == $length)
+		{
+			$str = mb_substr($str, 0, $length) . '…';
+		}
+		else
+		{
+			$str = mb_substr($str, 0, $position) . '…' . mb_substr($str, $l - ($length - $position));
+		}
 	}
 
 	$shortened = true;
@@ -132,15 +154,10 @@ function shorten($str, $length=32, $position=.75, &$shortened=null)
 
 /**
  * Removes the accents of a string.
- *
- * @param string $str
- * @param string $charset Defaults to {@link ICanBoogie\CHARSET}.
- *
- * @return string
  */
-function remove_accents($str, $charset=CHARSET)
+function remove_accents(string $str): string
 {
-	$str = htmlentities($str, ENT_NOQUOTES, $charset);
+	$str = htmlentities($str, ENT_NOQUOTES);
 
 	$str = preg_replace('#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
 	$str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str); // ligatures e.g. '&oelig;'
@@ -153,30 +170,20 @@ function remove_accents($str, $charset=CHARSET)
  * Binary-safe case-sensitive accents-insensitive string comparison.
  *
  * Accents are removed using the {@link remove_accents()} function.
- *
- * @param string $a
- * @param string $b
- *
- * @return bool
  */
-function unaccent_compare($a, $b)
+function unaccent_compare(string $a, string $b): int
 {
-    return strcmp(remove_accents($a), remove_accents($b));
+	return strcmp(remove_accents($a), remove_accents($b));
 }
 
 /**
  * Binary-safe case-insensitive accents-insensitive string comparison.
  *
  * Accents are removed using the {@link remove_accents()} function.
- *
- * @param string $a
- * @param string $b
- *
- * @return bool
  */
-function unaccent_compare_ci($a, $b)
+function unaccent_compare_ci(string $a, string $b): int
 {
-    return strcasecmp(remove_accents($a), remove_accents($b));
+	return strcasecmp(remove_accents($a), remove_accents($b));
 }
 
 /**
@@ -187,15 +194,12 @@ function unaccent_compare_ci($a, $b)
  *
  * @param string $str The string to normalize.
  * @param string $separator The separator characters replaces characters the don't match [a-z0-9].
- * @param string $charset The charset of the string to normalize.
- *
- * @return string
  */
-function normalize($str, $separator='-', $charset=CHARSET)
+function normalize(string $str, string $separator = '-'): string
 {
 	static $cache;
 
-	$cache_key = $charset . '|' . $separator . '|' . $str;
+	$cache_key = $separator . '|' . $str;
 
 	if (isset($cache[$cache_key]))
 	{
@@ -203,7 +207,7 @@ function normalize($str, $separator='-', $charset=CHARSET)
 	}
 
 	$str = str_replace('\'', '', $str);
-	$str = remove_accents($str, $charset);
+	$str = remove_accents($str);
 	$str = strtolower($str);
 	$str = preg_replace('#[^a-z0-9]+#', $separator, $str);
 	$str = trim($str, $separator);
@@ -216,12 +220,8 @@ function normalize($str, $separator='-', $charset=CHARSET)
  *
  * The function uses xdebug_var_dump() if [Xdebug](http://xdebug.org/) is installed, otherwise it
  * uses print_r() output wrapped in a PRE element.
- *
- * @param mixed $value
- *
- * @return string
  */
-function dump($value)
+function dump(mixed $value): string
 {
 	if (function_exists('xdebug_var_dump'))
 	{
@@ -253,10 +253,8 @@ function dump($value)
  *
  * Numeric indexes can also be used e.g "\\2" or "{2}" are replaced by the value of the index
  * "2".
- *
- * @return string
  */
-function format($str, array $args=array())
+function format(string $str, array $args = []): string
 {
 	static $quotation_start;
 	static $quotation_end;
@@ -280,7 +278,7 @@ function format($str, array $args=array())
 		return $str;
 	}
 
-	$holders = array();
+	$holders = [];
 	$i = 0;
 
 	foreach ($args as $key => $value)
@@ -294,13 +292,19 @@ function format($str, array $args=array())
 		{
 			$value = dump($value);
 		}
-		else if (is_bool($value))
+		else
 		{
-			$value = $value ? '`true`' : '`false`';
-		}
-		else if (is_null($value))
-		{
-			$value = '`null`';
+			if (is_bool($value))
+			{
+				$value = $value ? '`true`' : '`false`';
+			}
+			else
+			{
+				if (is_null($value))
+				{
+					$value = '`null`';
+				}
+			}
 		}
 
 		if (is_string($key))
@@ -347,11 +351,8 @@ function format($str, array $args=array())
  * The array is always sorted in ascending order but one can use the array_reverse() function to
  * reverse the array. Also keys are preserved, even numeric ones, use the array_values() function
  * to create an array with an ascending index.
- *
- * @param array &$array
- * @param callable $picker
  */
-function stable_sort(&$array, $picker=null)
+function stable_sort(array &$array, callable $picker = null): void
 {
 	static $transform, $restore;
 
@@ -359,26 +360,20 @@ function stable_sort(&$array, $picker=null)
 
 	if (!$transform)
 	{
-		$transform = function(&$v, $k) use (&$i)
-		{
-			$v = array($v, ++$i, $k, $v);
+		$transform = function (&$v, $k) use (&$i): void {
+			$v = [ $v, ++$i, $k, $v ];
 		};
 
-		$restore = function(&$v, $k)
-		{
+		$restore = function (&$v): void {
 			$v = $v[3];
 		};
 	}
 
 	if ($picker)
 	{
-		array_walk
-		(
-			$array, function(&$v, $k) use (&$i, $picker)
-			{
-				$v = array($picker($v, $k), ++$i, $k, $v);
-			}
-		);
+		array_walk($array, function (&$v, $k) use (&$i, $picker): void {
+			$v = [ $picker($v, $k), ++$i, $k, $v ];
+		});
 	}
 	else
 	{
@@ -402,14 +397,14 @@ function stable_sort(&$array, $picker=null)
  *
  * @return array A sorted copy of the array.
  */
-function sort_by_weight(array $array, $weight_picker)
+function sort_by_weight(array $array, callable $weight_picker): array
 {
 	if (!$array)
 	{
 		return $array;
 	}
 
-	$order = array();
+	$order = [];
 
 	foreach ($array as $k => $v)
 	{
@@ -418,7 +413,7 @@ function sort_by_weight(array $array, $weight_picker)
 
 	$n = count($order);
 
-	$numeric_order = array_filter($order, function ($weight) {
+	$numeric_order = array_filter($order, function ($weight): bool {
 		return is_scalar($weight) && is_numeric($weight);
 	});
 
@@ -439,7 +434,7 @@ function sort_by_weight(array $array, $weight_picker)
 		{
 			$weight = --$top;
 		}
-		else if ($weight === 'bottom')
+		elseif ($weight === 'bottom')
 		{
 			$weight = ++$bottom;
 		}
@@ -447,7 +442,7 @@ function sort_by_weight(array $array, $weight_picker)
 
 	foreach ($order as $k => &$weight)
 	{
-		if (strpos($weight, 'before:') === 0)
+		if (str_starts_with($weight, 'before:'))
 		{
 			$target = substr($weight, 7);
 
@@ -460,7 +455,7 @@ function sort_by_weight(array $array, $weight_picker)
 				$weight = 0;
 			}
 		}
-		else if (strpos($weight, 'after:') === 0)
+		elseif (str_starts_with($weight, 'after:'))
 		{
 			$target = substr($weight, 6);
 
@@ -477,10 +472,8 @@ function sort_by_weight(array $array, $weight_picker)
 
 	stable_sort($order);
 
-	array_walk($order, function(&$v, $k) use($array) {
-
-		$v = $array[$k];
-
+	array_walk($order, function (&$v, $k) use ($array): void {
+		$v = $array[ $k ];
 	});
 
 	return $order;
@@ -490,16 +483,8 @@ function sort_by_weight(array $array, $weight_picker)
  * Inserts a value in a array before, or after, a given key.
  *
  * Numeric keys are not preserved.
- *
- * @param $array
- * @param $relative
- * @param $value
- * @param $key
- * @param $after
- *
- * @return array
  */
-function array_insert($array, $relative, $value, $key=null, $after=false)
+function array_insert(array $array, mixed $relative, mixed $value, string|int $key = null, bool $after = false): array
 {
 	if ($key)
 	{
@@ -518,7 +503,7 @@ function array_insert($array, $relative, $value, $key=null, $after=false)
 
 	if ($key !== null)
 	{
-		$array = array_merge($array, array($key => $value));
+		$array = array_merge($array, [ $key => $value ]);
 	}
 	else
 	{
@@ -530,16 +515,10 @@ function array_insert($array, $relative, $value, $key=null, $after=false)
 
 /**
  * Flattens an array.
- *
- * @param array $array
- * @param string|array $separator
- * @param int $depth
- *
- * @return array
  */
-function array_flatten($array, $separator='.', $depth=0)
+function array_flatten(array $array, string|array $separator = '.', int $depth = 0): array
 {
-	$rc = array();
+	$rc = [];
 
 	if (is_array($separator))
 	{
@@ -585,16 +564,9 @@ function array_flatten($array, $separator='.', $depth=0)
 
 /**
  * Merge arrays recursively with a different algorithm than PHP.
- *
- * @param array $array1
- * @param array $array2 ...
- *
- * @return array
  */
-function array_merge_recursive(array $array1, array $array2=array())
+function array_merge_recursive(...$arrays): array
 {
-	$arrays = func_get_args();
-
 	$merge = array_shift($arrays);
 
 	foreach ($arrays as $array)
@@ -630,10 +602,8 @@ function array_merge_recursive(array $array1, array $array2=array())
 	return $merge;
 }
 
-function exact_array_merge_recursive(array $array1, array $array2=array())
+function exact_array_merge_recursive(...$arrays): array
 {
-	$arrays = func_get_args();
-
 	$merge = array_shift($arrays);
 
 	foreach ($arrays as $array)
@@ -660,15 +630,11 @@ function exact_array_merge_recursive(array $array1, array $array2=array())
 /**
  * Normalizes the path of a URL.
  *
- * @param string $path
- *
- * @return string
- *
  * @see http://en.wikipedia.org/wiki/URL_normalization
  */
-function normalize_url_path($path)
+function normalize_url_path(string $path): string
 {
-	static $cache = array();
+	static $cache = [];
 
 	$path = (string) $path;
 
@@ -677,7 +643,7 @@ function normalize_url_path($path)
 		return $cache[$path];
 	}
 
-	$normalized = preg_replace('#\/index\.(html|php)$#', '/', $path);
+	$normalized = preg_replace('#/index\.(html|php)$#', '/', $path);
 	$normalized = rtrim($normalized, '/');
 
 	if (!preg_match('#\.[a-z]+$#', $normalized))
@@ -693,14 +659,15 @@ function normalize_url_path($path)
 /**
  * Generates a v4 UUID.
  *
- * @return string
+ * @throws Exception
  *
  * @origin http://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid#answer-15875555
  */
-function generate_v4_uuid()
+function generate_v4_uuid(): string
 {
-	$data = openssl_random_pseudo_bytes(16);
+	$data = random_bytes(16);
 	$data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0010
 	$data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+
 	return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }

@@ -1,8 +1,7 @@
-# Common 
+# Common
 
 [![Release](https://img.shields.io/packagist/v/icanboogie/common.svg)](https://packagist.org/packages/icanboogie/common)
 [![Build Status](https://img.shields.io/travis/ICanBoogie/Common.svg)](http://travis-ci.org/ICanBoogie/Common)
-[![HHVM](https://img.shields.io/hhvm/icanboogie/common.svg)](http://hhvm.h4cc.de/package/icanboogie/common)
 [![Code Quality](https://img.shields.io/scrutinizer/g/ICanBoogie/Common.svg)](https://scrutinizer-ci.com/g/ICanBoogie/Common)
 [![Code Coverage](https://img.shields.io/coveralls/ICanBoogie/Common.svg)](https://coveralls.io/r/ICanBoogie/Common)
 [![Packagist](https://img.shields.io/packagist/dt/icanboogie/common.svg)](https://packagist.org/packages/icanboogie/common)
@@ -110,10 +109,7 @@ class A implements ToArrayRecursive
 
 
 
-## Traits
-
-For PHP5.4 users, the [ToArrayRecursiveTrait][] trait can be used to define
-the `to_array_recursive()` method.
+The [ToArrayRecursiveTrait][] trait can be used to define the `to_array_recursive()` method.
 
 ```php
 <?php
@@ -138,45 +134,15 @@ class A implements ToArrayRecursive
 
 ----------
 
-## Requirement
-
-The package requires PHP 5.3 or later.
-
 
 
 
 
 ## Installation
 
-The recommended way to install this package is through [Composer](http://getcomposer.org/).
-Create a `composer.json` file and run `php composer.phar install` command to install it:
-
+```bash
+composer require icanboogie/common
 ```
-$ composer require icanboogie/common
-```
-
-
-
-
-
-### Cloning the repository
-
-The package is [available on GitHub](https://github.com/ICanBoogie/Common), its repository can be
-cloned with the following command line:
-
-	$ git clone git://github.com/ICanBoogie/Common.git
-
-
-
-
-
-## Documentation
-
-The package is documented as part of the [ICanBoogie][] framework
-[documentation][]. You can generate the documentation for the package
-and its dependencies with the `make doc` command. The documentation is generated in the `docs`
-directory. [ApiGen](http://apigen.org/) is required. You can later clean the directory with
-the `make clean` command.
 
 
 
@@ -184,13 +150,14 @@ the `make clean` command.
 
 ## Testing
 
-The test suite is ran with the `make test` command. [Composer](http://getcomposer.org/) is
-automatically installed as well as all dependencies required to run the suite. You can later
-clean the directory with the `make clean` command.
+We provide a Docker container for local development. Run `make test-container` to create a new session. Inside the
+container run `make test` to run the test suite. Alternatively, run `make test-coverage` for a breakdown of the code
+coverage. The coverage report is available in `build/coverage/index.html`.
 
-The package is continuously tested by [Travis CI](http://about.travis-ci.org/).
+[Travis CI](http://about.travis-ci.org/) continuously test the package.
 
-[![Build Status](https://img.shields.io/travis/ICanBoogie/Common.svg)](http://travis-ci.org/ICanBoogie/Common)
+[![Build Status](https://img.shields.io/travis/ICanBoogie/Common.svg)](https://travis-ci.org/ICanBoogie/Common)
+[![Code Coverage](https://img.shields.io/coveralls/ICanBoogie/Common.svg)](https://coveralls.io/r/ICanBoogie/Common)
 
 
 
@@ -198,7 +165,7 @@ The package is continuously tested by [Travis CI](http://about.travis-ci.org/).
 
 ## License
 
-**icanboogie/common** is licensed under the New BSD License - See the [LICENSE](LICENSE) file for details.
+**icanboogie/common** is released under the [BSD-3-Clause](LICENSE).
 
 
 

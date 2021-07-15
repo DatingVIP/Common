@@ -11,51 +11,44 @@
 
 namespace ICanBoogie;
 
+use Throwable;
+use function get_class;
+use function is_array;
+use function is_object;
+
 /**
  * Exception thrown when an array offset is not writable.
  */
 class OffsetNotWritable extends OffsetError
 {
-	public function __construct($message, $code=500, \Exception $previous=null)
+	public function __construct(string|array $message, Throwable $previous = null)
 	{
 		if (is_array($message))
 		{
-			list($offset, $container) = $message + array(1 => null);
+			[ $offset, $container ] = $message + [ 1 => null ];
 
 			if (is_object($container))
 			{
-				$message = format
-				(
-					'The offset %offset for object of class %class is not writable.', array
-					(
-						'offset' => $offset,
-						'class' => get_class($container)
-					)
-				);
+				$message = format('The offset %offset for object of class %class is not writable.', [
+					'offset' => $offset,
+					'class' => get_class($container),
+				]);
 			}
-			else if (is_array($container))
+			elseif (is_array($container))
 			{
-				$message = format
-				(
-					'The offset %offset is not writable for the array: !array', array
-					(
-						'offset' => $offset,
-						'array' => $container
-					)
-				);
+				$message = format('The offset %offset is not writable for the array: !array', [
+					'offset' => $offset,
+					'array' => $container,
+				]);
 			}
 			else
 			{
-				$message = format
-				(
-					'The offset %offset is not writable.', array
-					(
-						'offset' => $offset
-					)
-				);
+				$message = format('The offset %offset is not writable.', [
+					'offset' => $offset,
+				]);
 			}
 		}
 
-		parent::__construct($message, $code, $previous);
+		parent::__construct($message, 0, $previous);
 	}
 }

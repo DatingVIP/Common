@@ -9,24 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace ICanBoogie;
+namespace Tests\ICanBoogie;
 
-use ICanBoogie\ToArrayRecursiveTraitTest\A;
+use ICanBoogie\ToArrayRecursive;
+use ICanBoogie\ToArrayRecursiveTrait;
+use PHPUnit\Framework\TestCase;
 
-class ToArrayRecursiveTraitTest extends \PHPUnit_Framework_TestCase
+/**
+ * @group unit
+ */
+final class ToArrayRecursiveTraitTest extends TestCase
 {
 	/**
 	 * @dataProvider provide_instances
-	 *
-	 * @param A $instance
-	 * @param array $expected
 	 */
-	public function test_to_array_recursive(A $instance, $expected)
+	public function test_to_array_recursive(A $instance, array $expected)
 	{
 		$this->assertEquals($expected, $instance->to_array_recursive());
 	}
 
-	public function provide_instances()
+	public function provide_instances(): array
 	{
 		return [
 
@@ -55,12 +57,7 @@ class ToArrayRecursiveTraitTest extends \PHPUnit_Framework_TestCase
 	}
 }
 
-namespace ICanBoogie\ToArrayRecursiveTraitTest;
-
-use ICanBoogie\ToArrayRecursive;
-use ICanBoogie\ToArrayRecursiveTrait;
-
-class A implements ToArrayRecursive
+final class A implements ToArrayRecursive
 {
 	use ToArrayRecursiveTrait;
 
@@ -72,7 +69,7 @@ class A implements ToArrayRecursive
 		}
 	}
 
-	public function to_array()
+	public function to_array(): array
 	{
 		return (array) $this;
 	}

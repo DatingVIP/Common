@@ -11,6 +11,11 @@
 
 namespace ICanBoogie;
 
+use Throwable;
+use function get_class;
+use function is_array;
+use function is_object;
+
 /**
  * Exception thrown when a property is not defined.
  *
@@ -18,35 +23,27 @@ namespace ICanBoogie;
  */
 class PropertyNotDefined extends PropertyError
 {
-	public function __construct($message, $code=500, \Exception $previous=null)
+	public function __construct(string|array $message, Throwable $previous = null)
 	{
 		if (is_array($message))
 		{
-			list($property, $container) = $message + array(1 => null);
+			[ $property, $container ] = $message + [ 1 => null ];
 
 			if (is_object($container))
 			{
-				$message = format
-				(
-					'Undefined property %property for object of class %class.', array
-					(
-						'%property' => $property,
-						'%class' => get_class($container)
-					)
-				);
+				$message = format('Undefined property %property for object of class %class.', [
+					'%property' => $property,
+					'%class' => get_class($container),
+				]);
 			}
 			else
 			{
-				$message = format
-				(
-					'Undefined property %property.', array
-					(
-						'%property' => $property
-					)
-				);
+				$message = format('Undefined property %property.', [
+					'%property' => $property,
+				]);
 			}
 		}
 
-		parent::__construct($message, $code, $previous);
+		parent::__construct($message, 0, $previous);
 	}
 }

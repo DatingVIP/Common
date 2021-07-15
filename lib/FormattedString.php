@@ -11,6 +11,10 @@
 
 namespace ICanBoogie;
 
+use function array_shift;
+use function func_get_args;
+use function is_array;
+
 /**
  * A formatted string.
  *
@@ -20,27 +24,23 @@ class FormattedString
 {
 	/**
 	 * String format.
-	 *
-	 * @var string
 	 */
-	protected $format;
+	private string $format;
 
 	/**
 	 * An array of replacements for the placeholders.
-	 *
-	 * @var array
 	 */
-	protected $args;
+	private array $args;
 
 	/**
 	 * Initializes the {@link $format} and {@link $args} properties.
 	 *
 	 * @param string $format String format.
-	 * @param array $args Format arguments.
+	 * @param mixed|null $args Format arguments.
 	 *
 	 * @see format()
 	 */
-	public function __construct($format, $args=null)
+	public function __construct(string $format, mixed $args = null)
 	{
 		if (!is_array($args))
 		{
@@ -54,10 +54,8 @@ class FormattedString
 
 	/**
 	 * Returns the string formatted with the {@link format()} function.
-	 *
-	 * @return string
 	 */
-	public function __toString()
+	public function __toString(): string
 	{
 		return format($this->format, $this->args);
 	}

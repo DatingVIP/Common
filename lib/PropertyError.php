@@ -11,6 +11,8 @@
 
 namespace ICanBoogie;
 
+use RuntimeException;
+
 /**
  * Exception thrown when there is something wrong with an object property.
  *
@@ -18,7 +20,7 @@ namespace ICanBoogie;
  * {@link PropertyNotDefined}, {@link PropertyNotReadable} or {@link PropertyNotWritable}
  * exceptions.
  */
-class PropertyError extends \RuntimeException
+class PropertyError extends RuntimeException
 {
 
 }

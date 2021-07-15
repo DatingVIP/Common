@@ -9,11 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ICanBoogie\Common\Tests\FormattedString;
+namespace Tests\ICanBoogie;
 
 use ICanBoogie\FormattedString;
+use PHPUnit\Framework\TestCase;
 
-class CommonTest extends \PHPUnit_Framework_TestCase // TODO-20121123: this are format() mostly
+/**
+ * @group unit
+ */
+final class FormattedStringTest extends TestCase
 {
 	public function testNoArgs()
 	{
@@ -23,19 +27,19 @@ class CommonTest extends \PHPUnit_Framework_TestCase // TODO-20121123: this are 
 
 	public function testArgsArray()
 	{
-		$s = new FormattedString('Testing... :a :b', array('a' => 'A', 'b' => 'B'));
+		$s = new FormattedString('Testing... :a :b', [ 'a' => 'A', 'b' => 'B' ]);
 		$this->assertEquals('Testing... A B', (string) $s);
 	}
 
 	public function testArgArrayAsIndex()
 	{
-		$s = new FormattedString('Testing... {0} {1}', array('a' => 'A', 'b' => 'B'));
+		$s = new FormattedString('Testing... {0} {1}', [ 'a' => 'A', 'b' => 'B' ]);
 		$this->assertEquals('Testing... A B', (string) $s);
 	}
 
 	public function testArgArrayIndex()
 	{
-		$s = new FormattedString('Testing... {0} {1}', array('A', 'B'));
+		$s = new FormattedString('Testing... {0} {1}', [ 'A', 'B' ]);
 		$this->assertEquals('Testing... A B', (string) $s);
 	}
 
@@ -47,7 +51,7 @@ class CommonTest extends \PHPUnit_Framework_TestCase // TODO-20121123: this are 
 
 	public function testEscaping()
 	{
-		$s = new FormattedString('Testing... !a', array('a' => '<>'));
+		$s = new FormattedString('Testing... !a', [ 'a' => '<>' ]);
 		$this->assertEquals('Testing... &lt;&gt;', (string) $s);
 	}
 
@@ -56,13 +60,13 @@ class CommonTest extends \PHPUnit_Framework_TestCase // TODO-20121123: this are 
 	 */
 	public function testExplicitEscaping()
 	{
-		$s = new FormattedString('Testing... :a', array('!a' => '<>'));
+		$s = new FormattedString('Testing... :a', [ '!a' => '<>' ]);
 		$this->assertEquals('Testing... :a', (string) $s);
 	}
 
 	public function testQuoting()
 	{
-		$s = new FormattedString('Testing... %a', array('a' => 'A'));
+		$s = new FormattedString('Testing... %a', [ 'a' => 'A' ]);
 		$this->assertEquals('Testing... `A`', (string) $s);
 	}
 
@@ -71,19 +75,19 @@ class CommonTest extends \PHPUnit_Framework_TestCase // TODO-20121123: this are 
 	 */
 	public function testExplicitQuoting()
 	{
-		$s = new FormattedString('Testing... :a', array('%a' => 'A'));
+		$s = new FormattedString('Testing... :a', [ '%a' => 'A' ]);
 		$this->assertEquals('Testing... :a', (string) $s);
 	}
 
 	public function testQuotingEscaped()
 	{
-		$s = new FormattedString('Testing... %a', array('a' => 'A<>'));
+		$s = new FormattedString('Testing... %a', [ 'a' => 'A<>' ]);
 		$this->assertEquals('Testing... `A&lt;&gt;`', (string) $s);
 	}
 
 	public function testAsIs()
 	{
-		$s = new FormattedString('Testing... :a', array('a' => 'A<>'));
+		$s = new FormattedString('Testing... :a', [ 'a' => 'A<>' ]);
 		$this->assertEquals('Testing... A<>', (string) $s);
 	}
 }

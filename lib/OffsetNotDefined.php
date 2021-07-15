@@ -11,6 +11,8 @@
 
 namespace ICanBoogie;
 
+use Throwable;
+
 /**
  * Exception thrown when an array offset is not defined.
  *
@@ -18,46 +20,34 @@ namespace ICanBoogie;
  */
 class OffsetNotDefined extends OffsetError
 {
-	public function __construct($message, $code=500, \Exception $previous=null)
+	public function __construct(string|array $message, Throwable $previous = null)
 	{
 		if (is_array($message))
 		{
-			list($offset, $container) = $message + array(1 => null);
+			[ $offset, $container ] = $message + [ 1 => null ];
 
 			if (is_object($container))
 			{
-				$message = format
-				(
-					'Undefined offset %offset for object of class %class.', array
-					(
-						'%offset' => $offset,
-						'%class' => get_class($container)
-					)
-				);
+				$message = format('Undefined offset %offset for object of class %class.', [
+					'%offset' => $offset,
+					'%class' => get_class($container),
+				]);
 			}
-			else if (is_array($container))
+			elseif (is_array($container))
 			{
-				$message = format
-				(
-					'Undefined offset %offset for the array: !array', array
-					(
-						'%offset' => $offset,
-						'!array' => $container
-					)
-				);
+				$message = format('Undefined offset %offset for the array: !array', [
+					'%offset' => $offset,
+					'!array' => $container,
+				]);
 			}
 			else
 			{
-				$message = format
-				(
-					'Undefined offset %offset.', array
-					(
-						'%offset' => $offset
-					)
-				);
+				$message = format('Undefined offset %offset.', [
+					'%offset' => $offset,
+				]);
 			}
 		}
 
-		parent::__construct($message, $code, $previous);
+		parent::__construct($message, 0, $previous);
 	}
 }
