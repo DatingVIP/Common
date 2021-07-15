@@ -1,7 +1,6 @@
 # Common
 
 [![Release](https://img.shields.io/packagist/v/icanboogie/common.svg)](https://packagist.org/packages/icanboogie/common)
-[![Build Status](https://img.shields.io/travis/ICanBoogie/Common.svg)](http://travis-ci.org/ICanBoogie/Common)
 [![Code Quality](https://img.shields.io/scrutinizer/g/ICanBoogie/Common.svg)](https://scrutinizer-ci.com/g/ICanBoogie/Common)
 [![Code Coverage](https://img.shields.io/coveralls/ICanBoogie/Common.svg)](https://coveralls.io/r/ICanBoogie/Common)
 [![Packagist](https://img.shields.io/packagist/dt/icanboogie/common.svg)](https://packagist.org/packages/icanboogie/common)
@@ -136,6 +135,12 @@ class A implements ToArrayRecursive
 
 
 
+## Continuous Integration
+
+The project is continuously tested by [GitHub actions](https://github.com/ICanBoogie/Common/actions).
+
+[![Tests](https://github.com/ICanBoogie/Common/workflows/test/badge.svg?branch=master)](https://github.com/ICanBoogie/master/actions?query=workflow%3Atest)
+
 
 
 ## Installation
@@ -143,8 +148,6 @@ class A implements ToArrayRecursive
 ```bash
 composer require icanboogie/common
 ```
-
-
 
 
 
@@ -161,13 +164,9 @@ coverage. The coverage report is available in `build/coverage/index.html`.
 
 
 
-
-
 ## License
 
 **icanboogie/common** is released under the [BSD-3-Clause](LICENSE).
-
-
 
 
 
